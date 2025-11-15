@@ -12,6 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -36,11 +38,32 @@
                         fadeIn: {
                             '0%': { opacity: '0', transform: 'translateY(20px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeOut: {
+                            '0%': { opacity: '1' },
+                            '100%': { opacity: '0', visibility: 'hidden' }
                         }
                     }
                 }
             }
         }
+        
+        // Add fadeOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; visibility: hidden; }
+            }
+            .animation-delay-200 { animation-delay: 0.2s; }
+            .animation-delay-400 { animation-delay: 0.4s; }
+            .animation-delay-600 { animation-delay: 0.6s; }
+            .animation-delay-800 { animation-delay: 0.8s; }
+            .animation-delay-1000 { animation-delay: 1s; }
+            .animate-float { animation: float 6s ease-in-out infinite; }
+            .animate-float-delay { animation: float 6s ease-in-out 1s infinite; }
+        `;
+        document.head.appendChild(style);
     </script>
     <style>
         :root {
@@ -144,7 +167,19 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 font-poppins">
+    <!-- Loading Animation -->
+    <div id="loader" class="fixed inset-0 bg-white dark:bg-gray-900 flex items-center justify-center z-50 transition-opacity duration-1000">
+        <div class="relative w-24 h-24">
+            <div class="absolute inset-0 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
+            <div class="absolute inset-4 rounded-full border-4 border-b-primary border-t-transparent border-r-transparent border-l-transparent animate-spin animation-delay-300"></div>
+            <div class="absolute inset-8 rounded-full border-4 border-l-primary border-t-transparent border-r-transparent border-b-transparent animate-spin animation-delay-600"></div>
+        </div>
+    </div>
+
+    <!-- Animated Background -->
+    <div id="particles-js" class="fixed inset-0 -z-10"></div>
+
+    <body class="bg-gray-50 font-poppins relative overflow-x-hidden">
     <!-- Navigation -->
     <nav class="fixed w-full bg-white dark:bg-gray-900 shadow-md z-50 transition-colors duration-300">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -219,7 +254,7 @@
                     <div class="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full animate-float"></div>
                     <div class="absolute inset-2 bg-white rounded-full flex items-center justify-center overflow-hidden">
                         <!-- Your Photo -->
-                        <img src="photo.jpg" alt="Adarsh Pandey" class="profile-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <img src="unnamed.jpg" alt="Adarsh Pandey" class="profile-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                       
                     </div>
                 </div>
@@ -885,11 +920,48 @@
             this.reset();
         });
 
+        // Page load animation
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.style.animation = 'fadeOut 0.5s forwards';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }
+
+            // Initialize particles.js
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: '#3B82F6' },
+                    shape: { type: 'circle' },
+                    opacity: { value: 0.5, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: { enable: true, distance: 150, color: '#3B82F6', opacity: 0.2, width: 1 },
+                    move: { enable: true, speed: 2, direction: 'none', random: true, straight: false, out_mode: 'out', bounce: false }
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: {
+                        onhover: { enable: true, mode: 'grab' },
+                        onclick: { enable: true, mode: 'push' },
+                        resize: true
+                    },
+                    modes: {
+                        grab: { distance: 140, line_linked: { opacity: 0.5 } },
+                        push: { particles_nb: 4 }
+                    }
+                },
+                retina_detect: true
+            });
+        });
+
         // Initialize AOS
         AOS.init({
             duration: 800,
-            easing: 'ease-in-out',
             once: true,
+            easing: 'ease-in-out',
             mirror: false
         });
 
